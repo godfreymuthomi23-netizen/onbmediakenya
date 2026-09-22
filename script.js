@@ -1,6 +1,23 @@
 const revealItems = document.querySelectorAll('[data-reveal]');
 const sections = document.querySelectorAll('main section[id]');
 const navigationLinks = document.querySelectorAll('nav a[href^="#"]');
+const eatClock = document.querySelector('[data-eat-clock]');
+
+const updateEatClock = () => {
+  if (!eatClock) return;
+  const now = new Date();
+  eatClock.textContent = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Africa/Nairobi',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  }).format(now);
+  eatClock.dateTime = now.toISOString();
+};
+
+updateEatClock();
+window.setInterval(updateEatClock, 1000);
 
 const revealObserver = new IntersectionObserver((entries, observer) => {
   entries.forEach(entry => {

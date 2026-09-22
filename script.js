@@ -1,4 +1,6 @@
 const revealItems = document.querySelectorAll('[data-reveal]');
+const sections = document.querySelectorAll('main section[id]');
+const navigationLinks = document.querySelectorAll('nav a[href^="#"]');
 
 const revealObserver = new IntersectionObserver((entries, observer) => {
   entries.forEach(entry => {
@@ -10,11 +12,31 @@ const revealObserver = new IntersectionObserver((entries, observer) => {
 
 revealItems.forEach(item => revealObserver.observe(item));
 
-document.querySelectorAll('a[href^="#"]').forEach(link => {
-  link.addEventListener('click', () => {
-    document.querySelectorAll('nav a').forEach(navLink => navLink.removeAttribute('aria-current'));
-    link.setAttribute('aria-current', 'page');
+const sectionObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    navigationLinks.forEach(link => {
+      link.toggleAttribute('aria-current', link.getAttribute('href') === `#${entry.target.id}`);
+    });
   });
+}, { rootMargin: '-35% 0px -55% 0px' });
+
+sections.forEach(section => sectionObserver.observe(section));
+
+document.querySelectorAll('[data-tilt]').forEach(card => {
+  card.addEventListener('pointermove', event => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const bounds = card.getBoundingClientRect();
+    const rotateX = ((event.clientY - bounds.top) / bounds.height - .5) * -5;
+    const rotateY = ((event.clientX - bounds.left) / bounds.width - .5) * 5;
+    card.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+  });
+  card.addEventListener('pointerleave', () => { card.style.transform = ''; });
+});
+
+document.querySelector('.play')?.addEventListener('click', event => {
+  event.currentTarget.classList.remove('is-playing');
+  requestAnimationFrame(() => event.currentTarget.classList.add('is-playing'));
 });
 
 console.log('ONB Media initialized.');

@@ -34,10 +34,26 @@ document.querySelectorAll('[data-tilt]').forEach(card => {
   card.addEventListener('pointerleave', () => { card.style.transform = ''; });
 });
 
-document.querySelector('.play')?.addEventListener('click', event => {
-  const playButton = event.currentTarget;
-  playButton.classList.remove('is-playing');
-  requestAnimationFrame(() => playButton.classList.add('is-playing'));
+const videoFrame = document.querySelector('[data-video-frame]');
+const videoEmbed = videoFrame?.querySelector('.video-embed');
+
+const sendVideoCommand = command => {
+  videoEmbed?.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: command, args: [] }), '*');
+};
+
+if (videoFrame && videoEmbed) {
+  videoEmbed.addEventListener('load', () => sendVideoCommand('mute'));
+  const videoObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => sendVideoCommand(entry.isIntersecting ? 'playVideo' : 'pauseVideo'));
+  }, { threshold: 0.45, rootMargin: '180px 0px' });
+  videoObserver.observe(videoFrame);
+}
+
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', () => {
+    navigationLinks.forEach(navLink => navLink.removeAttribute('aria-current'));
+    link.setAttribute('aria-current', 'page');
+  });
 });
 
 console.log('ONB Media initialized.');

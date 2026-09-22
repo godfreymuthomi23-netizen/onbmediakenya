@@ -35,8 +35,9 @@ document.querySelectorAll('[data-tilt]').forEach(card => {
 });
 
 document.querySelector('.play')?.addEventListener('click', event => {
-  event.currentTarget.classList.remove('is-playing');
-  requestAnimationFrame(() => event.currentTarget.classList.add('is-playing'));
+  const playButton = event.currentTarget;
+  playButton.classList.remove('is-playing');
+  requestAnimationFrame(() => playButton.classList.add('is-playing'));
 });
 
 console.log('ONB Media initialized.');

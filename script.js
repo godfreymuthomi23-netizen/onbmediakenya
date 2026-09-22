@@ -41,8 +41,15 @@ const sendVideoCommand = command => {
   videoEmbed?.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: command, args: [] }), '*');
 };
 
+const requestVideoQuality = () => {
+  videoEmbed?.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: 'setPlaybackQuality', args: ['hd1080'] }), '*');
+};
+
 if (videoFrame && videoEmbed) {
-  videoEmbed.addEventListener('load', () => sendVideoCommand('mute'));
+  videoEmbed.addEventListener('load', () => {
+    sendVideoCommand('mute');
+    requestVideoQuality();
+  });
   const videoObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => sendVideoCommand(entry.isIntersecting ? 'playVideo' : 'pauseVideo'));
   }, { threshold: 0.45, rootMargin: '180px 0px' });

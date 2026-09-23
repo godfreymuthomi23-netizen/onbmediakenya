@@ -6,18 +6,54 @@ const eatClock = document.querySelector('[data-eat-clock]');
 const updateEatClock = () => {
   if (!eatClock) return;
   const now = new Date();
-  eatClock.textContent = new Intl.DateTimeFormat('en-GB', {
+  eatClock.textContent = new Intl.DateTimeFormat('en-US', {
     timeZone: 'Africa/Nairobi',
-    hour: '2-digit',
+    hour: 'numeric',
     minute: '2-digit',
     second: '2-digit',
-    hour12: false
+    hour12: true
   }).format(now);
   eatClock.dateTime = now.toISOString();
 };
 
 updateEatClock();
 window.setInterval(updateEatClock, 1000);
+
+const cursorHalo = document.createElement('div');
+cursorHalo.id = 'cursor-halo';
+cursorHalo.setAttribute('aria-hidden', 'true');
+cursorHalo.style.position = 'fixed';
+cursorHalo.style.left = '0px';
+cursorHalo.style.top = '0px';
+cursorHalo.style.width = '22px';
+cursorHalo.style.height = '22px';
+cursorHalo.style.borderRadius = '50%';
+cursorHalo.style.pointerEvents = 'none';
+cursorHalo.style.zIndex = '9999';
+cursorHalo.style.background = 'radial-gradient(circle, rgba(122,231,210,0.9) 0%, rgba(122,231,210,0.22) 35%, rgba(122,231,210,0) 72%)';
+cursorHalo.style.transform = 'translate(-50%, -50%) scale(0.7)';
+cursorHalo.style.opacity = '0';
+cursorHalo.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+document.body.appendChild(cursorHalo);
+
+document.addEventListener('pointermove', event => {
+  cursorHalo.style.opacity = '1';
+  cursorHalo.style.left = `${event.clientX}px`;
+  cursorHalo.style.top = `${event.clientY}px`;
+  cursorHalo.style.transform = 'translate(-50%, -50%) scale(1)';
+});
+
+document.addEventListener('pointerdown', () => {
+  cursorHalo.style.transform = 'translate(-50%, -50%) scale(1.6)';
+});
+
+document.addEventListener('pointerup', () => {
+  cursorHalo.style.transform = 'translate(-50%, -50%) scale(1)';
+});
+
+document.addEventListener('pointerleave', () => {
+  cursorHalo.style.opacity = '0';
+});
 
 const revealObserver = new IntersectionObserver((entries, observer) => {
   entries.forEach(entry => {
